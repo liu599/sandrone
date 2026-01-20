@@ -1,11 +1,15 @@
-This is the [assistant-ui](https://github.com/Yonom/assistant-ui) starter project.
+## Project Description
+
+This project aims to provide a PPT/Video Knowledge Creation Tool.
+The project only contains FE implementation. Agent Code will be provided in a separate repo.
+This project is based on the [assistant-ui](https://github.com/Yonom/assistant-ui) starter project.
 
 ## Getting Started
 
 First, add your OpenAI API key to `.env.local` file:
 
 ```
-OPENAI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+GOOGLE_GENERATIVE_AI_API_KEY=sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
 Then, run the development server:
