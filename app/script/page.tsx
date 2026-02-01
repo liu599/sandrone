@@ -1,8 +1,11 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import { Assistant } from "../assistant";
 import { createScript } from "@/service/createScript";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 interface KeyPoint {
   content: string;
@@ -63,8 +66,14 @@ export default function ScriptPage() {
   if (!data) {
     return (
       <Assistant>
-        <div className="flex items-center justify-center h-full">
+        <div className="flex flex-col items-center justify-center h-full gap-4">
           <p>No data available.</p>
+          <Link href="/script/new">
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              New Script
+            </Button>
+          </Link>
         </div>
       </Assistant>
     );
@@ -74,13 +83,19 @@ export default function ScriptPage() {
     <Assistant>
       <div className="h-full overflow-y-auto">
         <div className="p-8 max-w-6xl mx-auto">
-          <header className="mb-8 border-b pb-4">
+          <header className="mb-8 border-b pb-4 flex justify-between items-center">
             <div className="flex items-center gap-4">
               <h1 className="text-3xl font-bold">{data.topic}</h1>
               <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded border border-blue-400">
                 {data.target_audience}
               </span>
             </div>
+            <Link href="/script/new">
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                New Script
+              </Button>
+            </Link>
           </header>
 
           <main className="space-y-12 pb-12">
@@ -152,16 +167,10 @@ export default function ScriptPage() {
                             </ul>
                           ) : (
                             <ul className="list-disc list-inside space-y-3">
-                              {slide.slide_type === "process" ? (
+                              {(
                                 slide.steps && slide.steps.map((step, stepIndex) => (
                                   <li key={stepIndex} className="text-sm text-gray-700 leading-relaxed marker:text-blue-500">
                                     {step.content}
-                                  </li>
-                                ))
-                              ) : (
-                                slide.key_points && slide.key_points.map((point, pointIndex) => (
-                                  <li key={pointIndex} className="text-sm text-gray-700 leading-relaxed marker:text-blue-500">
-                                    {point.content}
                                   </li>
                                 ))
                               )}
@@ -191,23 +200,13 @@ export default function ScriptPage() {
                           {slide.slide_type === 'summary' ? 'Final Closing' : 'Teaching Script'}
                         </h3>
                         <div className="space-y-5">
-                          {slide.slide_type === "process" ? (
+                          {
                             slide.steps && slide.steps.map((step, stepIndex) => (
                               <div key={stepIndex} className="text-gray-700 text-sm leading-relaxed relative pl-4 border-l-2 border-blue-200">
                                 {step.teaching_script}
                               </div>
                             ))
-                          ) : slide.slide_type === "summary" ? (
-                            <div className="text-indigo-900 text-base font-medium leading-relaxed italic pr-2">
-                              {slide.final_closing}
-                            </div>
-                          ) : (
-                            slide.key_points && slide.key_points.map((point, pointIndex) => (
-                              <div key={pointIndex} className="text-gray-700 text-sm leading-relaxed relative pl-4 border-l-2 border-blue-200">
-                                {point.teaching_script}
-                              </div>
-                            ))
-                          )}
+                          }
                         </div>
                       </div>
                     </div>

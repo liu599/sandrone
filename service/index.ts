@@ -62,13 +62,13 @@ class CustomAxios {
 
         // 统一响应格式
         const apiResponse: ApiResponse = {
-          code: res.error_code || res.code || 0,
-          message: res.msg || res.message || '操作成功',
-          data: res.data || null
+          code: res.error_code ?? res.code ?? 0,
+          message: res.msg ?? res.message ?? '操作成功',
+          data: res.data ?? null
         };
 
-        if (apiResponse && apiResponse.code !== 20000) {
-          // 如果code不为20000，说明有错误
+        if (apiResponse && apiResponse.code !== 20000 && apiResponse.code !== 0) {
+          // 如果code不为20000且不为0，说明有错误
           console.error('接口返回错误', apiResponse)
           return Promise.reject(apiResponse);
         }
@@ -96,7 +96,7 @@ class CustomAxios {
 export const requestInstance = new CustomAxios({
   baseURL: '/proxyUrl',
   // baseURL: '',
-  timeout: 120000,
+  timeout: 360000,
   // withCredentials: true // 请求携带cookie
 }).instance
 
