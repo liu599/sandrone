@@ -16,3 +16,12 @@ export const buildKnowledgeBase = (formData: FormData) => {
     },
   });
 };
+
+export const invertSearch = (params: {
+  indexing_id: string | number;
+  query: string;
+  top_k?: number;
+}) => {
+  return requestInstance.post("/agentOS/v1/invert_search/search", params);
+};
+

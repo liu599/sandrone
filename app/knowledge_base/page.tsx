@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
 interface KnowledgeBaseItem {
+  id: number;
   uuid: string;
   meta?: {
     name?: string;
@@ -52,7 +53,7 @@ export default function KnowledgeBasePage() {
   return (
     <div className="p-8">
       <div className="flex items-center space-x-4 mb-6">
-        <Button variant="ghost" size="icon" onClick={() => router.back()}>
+        <Button className={"cursor-pointer"} variant="ghost" size="icon" onClick={() => router.back()}>
           <ChevronLeft className="w-6 h-6" />
         </Button>
         <h1 className="text-2xl font-bold">Knowledge Base</h1>
@@ -69,7 +70,14 @@ export default function KnowledgeBasePage() {
             </div>
         ) : (
           list.map((item) => (
-            <div key={item.uuid} className="border border-gray-200 rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition-shadow h-40 bg-white">
+            <div
+              key={item.uuid}
+              className="border border-gray-200 rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition-shadow h-40 bg-white cursor-pointer"
+              onClick={() => {
+                const name = item.meta?.name || "";
+                router.push(`/knowledge_base/${item.id}?uuid=${item.uuid}&name=${encodeURIComponent(name)}`);
+              }}
+            >
               <div className="flex items-start">
                 <div className="bg-blue-100 p-2 rounded-md mr-3">
                   <FileText className="w-5 h-5 text-blue-600" />
@@ -78,13 +86,13 @@ export default function KnowledgeBasePage() {
                   <h3 className="font-semibold text-gray-900 truncate" title={item.meta?.name || item.uuid}>
                     {item.meta?.name || item.uuid}
                   </h3>
-                  <p className="text-xs text-gray-400 mt-1 truncate">ID: {item.uuid}</p>
+                  <p className="text-xs text-gray-400 mt-1 truncate">ID: {item.id}_{item.uuid}</p>
                 </div>
               </div>
               <div className="mt-4 pt-3 border-t border-gray-50">
                 <div className="flex justify-between items-center">
-                  <span className="text-xs text-gray-500">Documents</span>
-                  <span className="text-sm font-bold text-blue-600">{item.meta?.doc_ids?.length || 0}</span>
+                  <span className="text-xs text-gray-500"></span>
+                  <span className="text-sm font-bold text-blue-600">{item.meta?.doc_ids?.length || 0} Document(s)</span>
                 </div>
               </div>
             </div>
