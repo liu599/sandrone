@@ -40,18 +40,18 @@ export const Assistant = ({ children }: { children?: React.ReactNode }) => {
               <Separator orientation="vertical" className="mr-2 h-4" />
               <Breadcrumb>
                 <BreadcrumbList>
-                  <BreadcrumbItem className="hidden md:block">
-                    <BreadcrumbLink
-                      href="https://www.assistant-ui.com/docs/getting-started"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      Build Your Own ChatGPT UX
-                    </BreadcrumbLink>
-                  </BreadcrumbItem>
-                  <BreadcrumbSeparator className="hidden md:block" />
+                  {/*<BreadcrumbItem className="hidden md:block">*/}
+                  {/*  <BreadcrumbLink*/}
+                  {/*    href="https://www.assistant-ui.com/docs/getting-started"*/}
+                  {/*    target="_blank"*/}
+                  {/*    rel="noopener noreferrer"*/}
+                  {/*  >*/}
+                  {/*    Build Your Own ChatGPT UX*/}
+                  {/*  </BreadcrumbLink>*/}
+                  {/*</BreadcrumbItem>*/}
+                  {/*<BreadcrumbSeparator className="hidden md:block" />*/}
                   <BreadcrumbItem>
-                    <BreadcrumbPage>Starter Template</BreadcrumbPage>
+                    <BreadcrumbPage>Chat Assistant</BreadcrumbPage>
                   </BreadcrumbItem>
                 </BreadcrumbList>
               </Breadcrumb>
