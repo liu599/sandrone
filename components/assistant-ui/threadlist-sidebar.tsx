@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Github, MessagesSquare, FileCode } from "lucide-react";
+import { Github, MessagesSquare, FileCode, Database } from "lucide-react";
 import Link from "next/link";
 import {
   Sidebar,
@@ -57,6 +57,14 @@ export function ThreadListSidebar({
               <Link href="/script">
                 <FileCode className="size-4" />
                 <span>Script</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild>
+              <Link href="/knowledge_base">
+                <Database className="size-4" />
+                <span>Knowledge Base</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
