@@ -1,10 +1,11 @@
+"use client";
+
 import * as React from "react";
-import { Github, MessagesSquare, FileCode, Database } from "lucide-react";
+import { MessagesSquare, FileCode, Database, Book } from "lucide-react";
 import Link from "next/link";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
@@ -12,6 +13,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { ThreadList } from "@/components/assistant-ui/thread-list";
+import { UserFooter } from "@/components/auth/user-footer";
 
 export function ThreadListSidebar({
   ...props
@@ -73,35 +75,19 @@ export function ThreadListSidebar({
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
-        </SidebarMenu>
-        <ThreadList />
-      </SidebarContent>
-      <SidebarRail />
-      <SidebarFooter className="aui-sidebar-footer border-t">
-        <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <Link
-                href="#"
-                target="_blank"
-              >
-                <div className="aui-sidebar-footer-icon-wrapper flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                  <svg xmlns="http://www.w3.org/2000/svg"
-                       width="24"
-                       height="24" viewBox="0 0 24 24">
-                    <g fill="none" stroke="currentColor" stroke-linecap="round" strokeLinejoin="round" stroke-width="2"><path d="M18 21a6 6 0 0 0-12 0"/><circle cx="12" cy="11" r="4"/><rect width="18" height="18" x="3" y="3" rx="2"/></g></svg>
-                </div>
-                <div className="aui-sidebar-footer-heading flex flex-col gap-0.5 leading-none">
-                  <span className="aui-sidebar-footer-title font-semibold">
-                    Default User
-                  </span>
-                  <span>10,000 points</span>
-                </div>
+            <SidebarMenuButton asChild>
+              <Link href="/docs">
+                <Book className="size-4" />
+                <span>Documentation</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
-      </SidebarFooter>
+        <ThreadList />
+      </SidebarContent>
+      <SidebarRail />
+      <UserFooter />
     </Sidebar>
   );
 }
