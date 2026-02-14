@@ -50,7 +50,7 @@ const ToolUIWrapper = ({
         {isCancelledStatus
           ? "Cancelled tool: "
           : isLoadingStatus
-            ? "使用中: "
+            ? "运行中: "
             : "已完成: "}
         <span className="font-semibold">{toolName}</span>
       </p>

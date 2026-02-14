@@ -60,9 +60,10 @@ export interface SSETodoListEvent extends SSEBaseEvent {
 
 export interface SSETodoUpdateEvent extends SSEBaseEvent {
   type: "todo_update";
-  list_id: string;
-  item_id: string;
+  list_id?: string;
+  item_id?: string;
   completed?: boolean;
+  status?: string;
   text?: string;
 }
 

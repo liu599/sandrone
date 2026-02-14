@@ -114,6 +114,18 @@ export async function POST(req: Request) {
           });
         },
 
+        onTodoUpdate: (data) => {
+          emit({
+            ...baseFields,
+            id: crypto.randomUUID(),
+            type: "todo_update",
+            list_id: "default",
+            item_id: data.item_id,
+            completed: data.completed,
+            status: data.status,
+          });
+        },
+
         onError: (error) => {
           console.error("[Route] Agent error:", error);
           emit({

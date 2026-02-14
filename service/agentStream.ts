@@ -32,6 +32,12 @@ export interface AgentStreamCallbacks {
       active_form: string;
     }>;
   }) => void;
+  /** Fires when a todo_update event is received */
+  onTodoUpdate?: (data: {
+    item_id: string;
+    completed?: boolean;
+    status?: string;
+  }) => void;
 }
 
 /**
@@ -136,6 +142,13 @@ export function streamAgentMessage(
       if (parsed.type === "todo_list") {
         console.log("[AgentStream] Todo list received:", parsed.data?.list_id);
         callbacks.onTodoList?.(parsed.data);
+        return;
+      }
+
+      // Handle todo_update event
+      if (parsed.type === "todo_update") {
+        console.log("[AgentStream] Todo update received:", parsed.data?.item_id);
+        callbacks.onTodoUpdate?.(parsed.data);
         return;
       }
 

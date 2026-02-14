@@ -41,7 +41,7 @@ export const ToolFallback: ToolCallMessagePartComponent = ({
           isCancelledStatus && "text-muted-foreground line-through",
         )}
       >
-        {isCancelledStatus ? "Cancelled tool: " : isLoadingStatus ? "使用中: " : "已完成: "}
+        {isCancelledStatus ? "Cancelled tool: " : isLoadingStatus ? "运行中: " : "已完成: "}
         <span className="font-semibold">{toolName}</span>
       </p>
       <ToolDetailsDrawer

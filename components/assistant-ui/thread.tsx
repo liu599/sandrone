@@ -14,7 +14,6 @@ import {
   SubAgentUI,
   TodoListUI,
 } from "@/components/assistant-ui/tool-uis";
-import { TodoListDataUI } from "@/components/assistant-ui/todo-list";
 import { useTodoList } from "@/components/assistant-ui/use-todo-list";
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
 import { Button } from "@/components/ui/button";
@@ -33,10 +32,14 @@ import {
   ArrowDownIcon,
   ArrowUpIcon,
   CheckIcon,
+  CheckCircle2,
   ChevronLeftIcon,
   ChevronRightIcon,
+  Circle,
   CopyIcon,
   DownloadIcon,
+  ListTodo,
+  Loader2,
   MoreHorizontalIcon,
   PencilIcon,
   RefreshCwIcon,
@@ -52,6 +55,7 @@ export const Thread: FC = () => {
         ["--thread-max-width" as string]: "44rem",
       }}
     >
+      <FloatingTodoList />
       <ThreadPrimitive.Viewport
         turnAnchor="top"
         className="aui-thread-viewport relative flex flex-1 flex-col overflow-x-auto overflow-y-scroll scroll-smooth px-4 pt-4"
@@ -74,6 +78,64 @@ export const Thread: FC = () => {
         </ThreadPrimitive.ViewportFooter>
       </ThreadPrimitive.Viewport>
     </ThreadPrimitive.Root>
+  );
+};
+
+const FloatingTodoList: FC = () => {
+  const todoLists = useTodoList();
+
+  if (todoLists.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="absolute top-0 left-0 right-0 z-40 pointer-events-none">
+      <div className="mx-auto flex w-full max-w-(--thread-max-width) flex-col gap-2 px-4 pt-4 pointer-events-auto">
+        {todoLists.map((todoList) => (
+          <div
+            key={todoList.list_id}
+            className="rounded-lg border bg-card/80 backdrop-blur-sm shadow-sm overflow-hidden"
+          >
+            <div className="flex items-center gap-2 border-b bg-muted/50 px-4 py-2.5">
+              <ListTodo className="size-4 text-primary" />
+              <h3 className="font-medium text-sm">Todo List</h3>
+            </div>
+            <ul className="divide-y max-h-64 overflow-y-auto">
+              {todoList.items.map((item, index) => (
+                <li
+                  key={`${todoList.list_id}-${item.content}-${index}`}
+                  className="flex items-center gap-3 px-4 py-2"
+                >
+                  {item.status === "completed" ? (
+                    <CheckCircle2 className="size-4 shrink-0 text-primary" />
+                  ) : item.status === "in_progress" ? (
+                    <Loader2 className="size-4 shrink-0 text-blue-500 animate-spin" />
+                  ) : (
+                    <Circle className="size-4 shrink-0 text-muted-foreground" />
+                  )}
+                  <div className="flex flex-col flex-1 min-w-0">
+                    <span
+                      className={cn(
+                        "text-sm truncate",
+                        item.status === "completed" &&
+                          "text-muted-foreground line-through"
+                      )}
+                    >
+                      {item.content}
+                    </span>
+                    {item.status === "in_progress" && item.active_form && (
+                      <span className="text-xs text-muted-foreground mt-0.5 truncate">
+                        {item.active_form}
+                      </span>
+                    )}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 };
 
@@ -218,8 +280,6 @@ const MessageError: FC = () => {
 };
 
 const AssistantMessage: FC = () => {
-  const todoLists = useTodoList();
-
   return (
     <MessagePrimitive.Root
       className="aui-assistant-message-root fade-in slide-in-from-bottom-1 relative mx-auto w-full max-w-(--thread-max-width) animate-in py-3 duration-150"
@@ -239,9 +299,6 @@ const AssistantMessage: FC = () => {
             },
           }}
         />
-        {todoLists.map((todoList) => (
-          <TodoListDataUI key={todoList.list_id} data={todoList} />
-        ))}
         <MessageError />
       </div>
 

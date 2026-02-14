@@ -158,6 +158,23 @@ export class CustomChatTransport extends HttpChatTransport<UIMessage> {
               break;
             }
 
+            case "todo_update": {
+              // Emit a custom event for todo item updates
+              if (typeof window !== "undefined") {
+                const updateData = {
+                  list_id: event.list_id,
+                  item_id: event.item_id,
+                  completed: event.completed,
+                  status: event.status,
+                };
+                console.log("[CustomChatTransport] Dispatching todo_item_update event:", updateData);
+                window.dispatchEvent(
+                  new CustomEvent("todo_item_update", { detail: updateData })
+                );
+              }
+              break;
+            }
+
             case "image": {
               controller.enqueue({
                 type: "file",
