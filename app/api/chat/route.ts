@@ -75,6 +75,45 @@ export async function POST(req: Request) {
           close();
         },
 
+        onSubAgent: (data) => {
+          emit({
+            ...baseFields,
+            id: crypto.randomUUID(),
+            type: "sub_agent",
+            tool_use_id: data.toolUseId,
+            data: {
+              agentName: data.agentName,
+              subAgentId: data.subAgentId,
+              prompt: data.prompt,
+              message: data.message,
+            },
+          });
+        },
+
+        onSubAgentEnd: (data) => {
+          emit({
+            ...baseFields,
+            id: crypto.randomUUID(),
+            type: "sub_agent_end",
+            tool_use_id: data.toolUseId,
+            data: {
+              message: data.message,
+            },
+          });
+        },
+
+        onTodoList: (data) => {
+          emit({
+            ...baseFields,
+            id: crypto.randomUUID(),
+            type: "todo_list",
+            data: {
+              list_id: data.list_id,
+              items: data.items,
+            },
+          });
+        },
+
         onError: (error) => {
           console.error("[Route] Agent error:", error);
           emit({

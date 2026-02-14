@@ -142,15 +142,19 @@ export class CustomChatTransport extends HttpChatTransport<UIMessage> {
             }
 
             case "todo_list": {
-              controller.enqueue({
-                type: "data-todo_list",
-                id: event.list_id,
-                data: {
-                  list_id: event.list_id,
-                  title: event.title,
-                  items: event.items,
-                },
-              } as UIMessageChunk);
+              // Store todo_list data in window for thread component to access
+              // This is a temporary mechanism until proper custom data support is added
+              if (typeof window !== "undefined") {
+                const todoData = {
+                  list_id: event.data.list_id,
+                  items: event.data.items,
+                  timestamp: Date.now(),
+                };
+                // Emit a custom event that the thread component can listen to
+                window.dispatchEvent(
+                  new CustomEvent("todo_list_update", { detail: todoData })
+                );
+              }
               break;
             }
 
@@ -167,6 +171,28 @@ export class CustomChatTransport extends HttpChatTransport<UIMessage> {
               controller.enqueue({
                 type: "error",
                 errorText: event.error,
+              });
+              break;
+            }
+
+            case "sub_agent": {
+              controller.enqueue({
+                type: "tool-input-available",
+                toolCallId: event.tool_use_id,
+                toolName: `SubAgent: ${event.data.agentName}`,
+                input: {
+                  prompt: event.data.prompt,
+                  subAgentId: event.data.subAgentId,
+                },
+              });
+              break;
+            }
+
+            case "sub_agent_end": {
+              controller.enqueue({
+                type: "tool-output-available",
+                toolCallId: event.tool_use_id,
+                output: event.data.message,
               });
               break;
             }

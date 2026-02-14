@@ -9,6 +9,13 @@ import {
   ReasoningGroup,
 } from "@/components/assistant-ui/reasoning";
 import { ToolFallback } from "@/components/assistant-ui/tool-fallback";
+import {
+  SearchKnowledgeBaseUI,
+  SubAgentUI,
+  TodoListUI,
+} from "@/components/assistant-ui/tool-uis";
+import { TodoListDataUI } from "@/components/assistant-ui/todo-list";
+import { useTodoList } from "@/components/assistant-ui/use-todo-list";
 import { TooltipIconButton } from "@/components/assistant-ui/tooltip-icon-button";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -211,6 +218,8 @@ const MessageError: FC = () => {
 };
 
 const AssistantMessage: FC = () => {
+  const todoLists = useTodoList();
+
   return (
     <MessagePrimitive.Root
       className="aui-assistant-message-root fade-in slide-in-from-bottom-1 relative mx-auto w-full max-w-(--thread-max-width) animate-in py-3 duration-150"
@@ -222,9 +231,17 @@ const AssistantMessage: FC = () => {
             Text: MarkdownText,
             Reasoning,
             ReasoningGroup,
-            tools: { Fallback: ToolFallback },
+            tools: {
+              Fallback: ToolFallback,
+              search_knowledge_base: SearchKnowledgeBaseUI,
+              SubAgent: SubAgentUI,
+              TodoList: TodoListUI,
+            },
           }}
         />
+        {todoLists.map((todoList) => (
+          <TodoListDataUI key={todoList.list_id} data={todoList} />
+        ))}
         <MessageError />
       </div>
 

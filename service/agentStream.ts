@@ -10,6 +10,28 @@ export interface AgentStreamCallbacks {
   onDone: () => void;
   /** Fires on WebSocket errors */
   onError: (error: Error) => void;
+  /** Fires when a sub-agent is invoked */
+  onSubAgent?: (data: {
+    toolUseId: string;
+    agentName: string;
+    subAgentId: string;
+    prompt: string;
+    message: string;
+  }) => void;
+  /** Fires when a sub-agent returns its result */
+  onSubAgentEnd?: (data: {
+    toolUseId: string;
+    message: string;
+  }) => void;
+  /** Fires when a todo_list event is received */
+  onTodoList?: (data: {
+    list_id: string;
+    items: Array<{
+      content: string;
+      status: string;
+      active_form: string;
+    }>;
+  }) => void;
 }
 
 /**
@@ -87,8 +109,39 @@ export function streamAgentMessage(
         return;
       }
 
+      // Handle sub_agent event
+      if (parsed.type === "sub_agent") {
+        console.log("[AgentStream] Sub-agent invoked:", parsed.data?.agentName);
+        callbacks.onSubAgent?.({
+          toolUseId: parsed.tool_use_id || parsed.data?.subAgentId,
+          agentName: parsed.data?.agentName,
+          subAgentId: parsed.data?.subAgentId,
+          prompt: parsed.data?.prompt,
+          message: parsed.data?.message,
+        });
+        return;
+      }
+
+      // Handle sub_agent_end event
+      if (parsed.type === "sub_agent_end") {
+        console.log("[AgentStream] Sub-agent ended:", parsed.tool_use_id);
+        callbacks.onSubAgentEnd?.({
+          toolUseId: parsed.tool_use_id,
+          message: parsed.data?.message,
+        });
+        return;
+      }
+
+      // Handle todo_list event
+      if (parsed.type === "todo_list") {
+        console.log("[AgentStream] Todo list received:", parsed.data?.list_id);
+        callbacks.onTodoList?.(parsed.data);
+        return;
+      }
+
       // ── Unknown event type — log and pass content if available ──
       console.log("[AgentStream] Unknown type:", parsed.type, raw);
+
       if (typeof parsed.content === "string" && parsed.content) {
         callbacks.onTextDelta(parsed.content);
       }

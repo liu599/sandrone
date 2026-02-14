@@ -1,13 +1,16 @@
 import type { ToolCallMessagePartComponent } from "@assistant-ui/react";
 import {
   CheckIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
+  Loader2Icon,
   XCircleIcon,
 } from "lucide-react";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import {
+  CopyButton,
+  ToolDetailsDrawer,
+  isCancelled as checkIsCancelled,
+  isLoading as checkIsLoading,
+} from "@/components/assistant-ui/tool-ui-shared";
 
 export const ToolFallback: ToolCallMessagePartComponent = ({
   toolName,
@@ -15,79 +18,38 @@ export const ToolFallback: ToolCallMessagePartComponent = ({
   result,
   status,
 }) => {
-  const [isCollapsed, setIsCollapsed] = useState(true);
-
-  const isCancelled =
-    status?.type === "incomplete" && status.reason === "cancelled";
-  const cancelledReason =
-    isCancelled && status.error
-      ? typeof status.error === "string"
-        ? status.error
-        : JSON.stringify(status.error)
-      : null;
+  const isCancelledStatus = checkIsCancelled(status);
+  const isLoadingStatus = checkIsLoading(status);
 
   return (
     <div
       className={cn(
-        "aui-tool-fallback-root mb-4 flex w-full flex-col gap-3 rounded-lg border py-3",
-        isCancelled && "border-muted-foreground/30 bg-muted/30",
+        "aui-tool-fallback-root mb-4 flex w-full items-center gap-2 rounded-lg border py-2 px-4 transition-colors",
+        isCancelledStatus && "border-muted-foreground/30 bg-muted/30",
       )}
     >
-      <div className="aui-tool-fallback-header flex items-center gap-2 px-4">
-        {isCancelled ? (
-          <XCircleIcon className="aui-tool-fallback-icon size-4 text-muted-foreground" />
-        ) : (
-          <CheckIcon className="aui-tool-fallback-icon size-4" />
-        )}
-        <p
-          className={cn(
-            "aui-tool-fallback-title grow",
-            isCancelled && "text-muted-foreground line-through",
-          )}
-        >
-          {isCancelled ? "Cancelled tool: " : "Used tool: "}
-          <b>{toolName}</b>
-        </p>
-        <Button onClick={() => setIsCollapsed(!isCollapsed)}>
-          {isCollapsed ? <ChevronUpIcon /> : <ChevronDownIcon />}
-        </Button>
-      </div>
-      {!isCollapsed && (
-        <div className="aui-tool-fallback-content flex flex-col gap-2 border-t pt-2">
-          {cancelledReason && (
-            <div className="aui-tool-fallback-cancelled-root px-4">
-              <p className="aui-tool-fallback-cancelled-header font-semibold text-muted-foreground">
-                Cancelled reason:
-              </p>
-              <p className="aui-tool-fallback-cancelled-reason text-muted-foreground">
-                {cancelledReason}
-              </p>
-            </div>
-          )}
-          <div
-            className={cn(
-              "aui-tool-fallback-args-root px-4",
-              isCancelled && "opacity-60",
-            )}
-          >
-            <pre className="aui-tool-fallback-args-value whitespace-pre-wrap">
-              {argsText}
-            </pre>
-          </div>
-          {!isCancelled && result !== undefined && (
-            <div className="aui-tool-fallback-result-root border-t border-dashed px-4 pt-2">
-              <p className="aui-tool-fallback-result-header font-semibold">
-                Result:
-              </p>
-              <pre className="aui-tool-fallback-result-content whitespace-pre-wrap">
-                {typeof result === "string"
-                  ? result
-                  : JSON.stringify(result, null, 2)}
-              </pre>
-            </div>
-          )}
-        </div>
+      {isCancelledStatus ? (
+        <XCircleIcon className="aui-tool-fallback-icon size-4 text-muted-foreground" />
+      ) : isLoadingStatus ? (
+        <Loader2Icon className="aui-tool-fallback-icon size-4 animate-spin" />
+      ) : (
+        <CheckIcon className="aui-tool-fallback-icon size-4 text-green-500" />
       )}
+      <p
+        className={cn(
+          "aui-tool-fallback-title grow text-sm",
+          isCancelledStatus && "text-muted-foreground line-through",
+        )}
+      >
+        {isCancelledStatus ? "Cancelled tool: " : isLoadingStatus ? "使用中: " : "已完成: "}
+        <span className="font-semibold">{toolName}</span>
+      </p>
+      <ToolDetailsDrawer
+        toolName={toolName}
+        argsText={argsText}
+        result={result}
+        status={status}
+      />
     </div>
   );
 };

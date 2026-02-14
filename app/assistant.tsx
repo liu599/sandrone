@@ -7,6 +7,7 @@ import { Thread } from "@/components/assistant-ui/thread";
 import {
   TodoListUI,
   SearchKnowledgeBaseUI,
+  SubAgentUI,
 } from "@/components/assistant-ui/tool-uis";
 import {
   SidebarInset,
@@ -56,6 +57,7 @@ export const Assistant = ({ children }: { children?: React.ReactNode }) => {
       <AuthHydrator />
       <TodoListUI />
       <SearchKnowledgeBaseUI />
+      <SubAgentUI />
       <SidebarProvider>
         <div className="flex h-dvh w-full pr-0.5">
           <ThreadListSidebar />

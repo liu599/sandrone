@@ -48,9 +48,14 @@ export interface SSEToolResultEvent extends SSEBaseEvent {
 
 export interface SSETodoListEvent extends SSEBaseEvent {
   type: "todo_list";
-  list_id: string;
-  title: string;
-  items: TodoItem[];
+  data: {
+    list_id: string;
+    items: Array<{
+      content: string;
+      status: string;
+      active_form: string;
+    }>;
+  };
 }
 
 export interface SSETodoUpdateEvent extends SSEBaseEvent {
@@ -78,6 +83,25 @@ export interface SSEDoneEvent extends SSEBaseEvent {
   type: "done";
 }
 
+export interface SSESubAgentEvent extends SSEBaseEvent {
+  type: "sub_agent";
+  tool_use_id: string;
+  data: {
+    agentName: string;
+    subAgentId: string;
+    prompt: string;
+    message: string;
+  };
+}
+
+export interface SSESubAgentEndEvent extends SSEBaseEvent {
+  type: "sub_agent_end";
+  tool_use_id: string;
+  data: {
+    message: string;
+  };
+}
+
 export type SSEEvent =
   | SSETextDeltaEvent
   | SSETextEvent
@@ -88,4 +112,6 @@ export type SSEEvent =
   | SSETodoUpdateEvent
   | SSEImageEvent
   | SSEErrorEvent
+  | SSESubAgentEvent
+  | SSESubAgentEndEvent
   | SSEDoneEvent;
