@@ -6,7 +6,7 @@ let singleMicroApp: any = null;
 
 export default function DocsPage() {
   const [authorized, setAuthorized] = useState<boolean | null>(true);
-  const [product, setProduct] = useState<[string] | null>(['default', 'ux1', 'po1']);
+  const [product, setProduct] = useState<string[] | null>(['default', 'ux1', 'po1']);
   const router = useRouter();
   const appName = 'teaching'
     useEffect(() => {
