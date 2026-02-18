@@ -89,6 +89,9 @@ export const Thread: FC = () => {
         <ThreadPrimitive.ViewportFooter className="aui-thread-viewport-footer sticky bottom-0 mx-auto mt-auto flex w-full max-w-[var(--thread-max-width)] flex-col gap-4 overflow-visible rounded-t-3xl bg-background pb-4 md:pb-6">
           <ThreadScrollToBottom />
           <Composer />
+          <p className="text-center" style={{ color: "rgba(169, 170, 184, .8)", fontSize: "12px" }}>
+            Lumine是一款人工智能工具，其回答内容未必正确, 请谨慎确认。
+          </p>
         </ThreadPrimitive.ViewportFooter>
       </ThreadPrimitive.Viewport>
     </ThreadPrimitive.Root>
@@ -293,6 +296,29 @@ const MessageError: FC = () => {
   );
 };
 
+const ThinkingIndicator: FC = () => (
+  <AssistantIf condition={({ thread }) => thread.isRunning}>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      className="my-1"
+      style={{ color: "#ff3b72" }}
+    >
+      <circle cx="4" cy="12" r="1.5" fill="currentColor">
+        <animate attributeName="r" dur="0.75s" repeatCount="indefinite" values="1.5;3;1.5" />
+      </circle>
+      <circle cx="12" cy="12" r="3" fill="currentColor">
+        <animate attributeName="r" dur="0.75s" repeatCount="indefinite" values="3;1.5;3" />
+      </circle>
+      <circle cx="20" cy="12" r="1.5" fill="currentColor">
+        <animate attributeName="r" dur="0.75s" repeatCount="indefinite" values="1.5;3;1.5" />
+      </circle>
+    </svg>
+  </AssistantIf>
+);
+
 const AssistantMessage: FC = () => {
   return (
     <MessagePrimitive.Root
@@ -315,6 +341,7 @@ const AssistantMessage: FC = () => {
             },
           }}
         />
+        <ThinkingIndicator />
         <MessageError />
       </div>
 
