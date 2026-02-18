@@ -105,7 +105,7 @@ export default function DocsPage() {
         <div>
             <micro-app
                 name={appName}
-                url={`http://localhost:4173`}
+                url={`https://app.ecs32.top`}
                 router-mode="search"
                 onCreated={() => console.log('micro-app元素被创建')}
                 onBeforemount={() => console.log('即将渲染')}
