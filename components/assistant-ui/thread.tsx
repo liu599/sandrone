@@ -27,6 +27,7 @@ import {
   ErrorPrimitive,
   MessagePrimitive,
   ThreadPrimitive,
+  useThread,
 } from "@assistant-ui/react";
 import {
   ArrowDownIcon,
@@ -45,7 +46,19 @@ import {
   RefreshCwIcon,
   SquareIcon,
 } from "lucide-react";
-import type { FC } from "react";
+import { type FC, useEffect } from "react";
+import { setActiveThreadId } from "@/lib/chat/active-thread";
+
+// Tracks the current thread ID and syncs it to the module-level variable so
+// CustomChatTransport can read it outside of React context.
+// Must be placed inside ThreadPrimitive.Root to have access to thread context.
+const ThreadIdTracker: FC = () => {
+  const threadId = useThread((s) => s.threadId);
+  useEffect(() => {
+    setActiveThreadId(threadId ?? null);
+  }, [threadId]);
+  return null;
+};
 
 export const Thread: FC = () => {
   return (
@@ -55,6 +68,7 @@ export const Thread: FC = () => {
         ["--thread-max-width" as string]: "44rem",
       }}
     >
+      <ThreadIdTracker />
       <FloatingTodoList />
       <ThreadPrimitive.Viewport
         turnAnchor="top"

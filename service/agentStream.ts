@@ -50,6 +50,7 @@ export interface AgentStreamCallbacks {
 export function streamAgentMessage(
   content: string,
   token: string | null,
+  sessionId: string | null,
   callbacks: AgentStreamCallbacks,
 ): () => void {
   const ws = new WebSocket(AGENT_WS_URL);
@@ -57,7 +58,13 @@ export function streamAgentMessage(
 
   ws.addEventListener("open", () => {
     console.log("[AgentStream] Connected to", AGENT_WS_URL);
-    ws.send(JSON.stringify({ content, token: token || undefined }));
+    ws.send(
+      JSON.stringify({
+        content,
+        token: token || undefined,
+        session_id: sessionId || undefined,
+      }),
+    );
   });
 
   ws.addEventListener("message", (event) => {

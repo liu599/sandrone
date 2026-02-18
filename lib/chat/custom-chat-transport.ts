@@ -5,18 +5,31 @@ import {
   type UIMessage,
 } from "ai";
 import type { SSEEvent } from "./types";
+import { getActiveThreadId } from "./active-thread";
+import { useThreadSessionStore } from "@/lib/store/thread-session-store";
 
 export class CustomChatTransport extends HttpChatTransport<UIMessage> {
   constructor(options?: Partial<HttpChatTransportInitOptions<UIMessage>>) {
     super({
       api: "/api/chat",
       headers: (): Record<string, string> => {
-        const token =
-          typeof window !== "undefined"
-            ? localStorage.getItem("userToken")
-            : null;
-        if (token) return { Authorization: `Bearer ${token}` };
-        return {};
+        const headers: Record<string, string> = {};
+
+        if (typeof window === "undefined") return headers;
+
+        const token = localStorage.getItem("userToken");
+        if (token) headers["Authorization"] = `Bearer ${token}`;
+
+        // Attach the persisted session ID for the current thread so the
+        // backend can restore session memory across reconnections.
+        const threadId = getActiveThreadId();
+        if (threadId) {
+          const sessionId =
+            useThreadSessionStore.getState().getSessionId(threadId);
+          if (sessionId) headers["X-Session-ID"] = sessionId;
+        }
+
+        return headers;
       },
       ...options,
     });
@@ -25,6 +38,11 @@ export class CustomChatTransport extends HttpChatTransport<UIMessage> {
   protected processResponseStream(
     stream: ReadableStream<Uint8Array>,
   ): ReadableStream<UIMessageChunk> {
+    // Capture the active thread ID at the start of this request so that
+    // even if the user switches threads mid-stream we store the session ID
+    // against the correct thread.
+    const threadId = getActiveThreadId();
+
     let firstEvent = true;
     let textOpen = false;
     let reasoningOpen = false;
@@ -211,6 +229,19 @@ export class CustomChatTransport extends HttpChatTransport<UIMessage> {
                 toolCallId: event.tool_use_id,
                 output: event.data.message,
               });
+              break;
+            }
+
+            case "session_id": {
+              // Persist the backend session ID for this thread so subsequent
+              // requests can include X-Session-ID and share session memory.
+              // Only store once — we always use the first session ID received.
+              if (threadId) {
+                const store = useThreadSessionStore.getState();
+                if (!store.getSessionId(threadId)) {
+                  store.setSessionId(threadId, event.session_id);
+                }
+              }
               break;
             }
 

@@ -84,6 +84,11 @@ export interface SSEDoneEvent extends SSEBaseEvent {
   type: "done";
 }
 
+export interface SSESessionIdEvent {
+  type: "session_id";
+  session_id: string;
+}
+
 export interface SSESubAgentEvent extends SSEBaseEvent {
   type: "sub_agent";
   tool_use_id: string;
@@ -115,4 +120,5 @@ export type SSEEvent =
   | SSEErrorEvent
   | SSESubAgentEvent
   | SSESubAgentEndEvent
-  | SSEDoneEvent;
+  | SSEDoneEvent
+  | SSESessionIdEvent;

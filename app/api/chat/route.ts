@@ -19,11 +19,14 @@ export async function POST(req: Request) {
     ? authHeader.slice(7)
     : null;
 
-  const sessionId = crypto.randomUUID();
+  // Use the session ID provided by the frontend (from a previous connection),
+  // so the backend can restore session memory for this thread.
+  const clientSessionId = req.headers.get("X-Session-ID") || null;
+
   const convId = crypto.randomUUID();
 
   const baseFields = {
-    session_id: sessionId,
+    session_id: clientSessionId ?? crypto.randomUUID(),
     conversation_id: convId,
     role: "assistant" as const,
   };
@@ -44,7 +47,7 @@ export async function POST(req: Request) {
         controller.close();
       };
 
-      const abort = streamAgentMessage(content, token, {
+      const abort = streamAgentMessage(content, token, clientSessionId, {
         onSessionId: (agentSessionId, agentConvId) => {
           // Update base fields with the real session/conversation IDs
           baseFields.session_id = agentSessionId;
@@ -55,6 +58,8 @@ export async function POST(req: Request) {
             "conv:",
             agentConvId,
           );
+          // Forward the real session_id to the frontend so it can persist it
+          emit({ type: "session_id", session_id: agentSessionId });
         },
 
         onTextDelta: (text) => {
