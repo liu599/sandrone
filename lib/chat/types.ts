@@ -108,6 +108,26 @@ export interface SSESubAgentEndEvent extends SSEBaseEvent {
   };
 }
 
+export interface CanvasFile {
+  uuid: string;
+  filename: string;
+  downloadUrl: string;
+  fileType: string;
+  description?: string;
+  module: string;
+  createdAt: string;
+  modificationsCount?: number;
+}
+
+export interface SSEUseCanvasEvent extends SSEBaseEvent {
+  type: "use_canvas";
+  data: {
+    action: "create" | "modify";
+    file: CanvasFile;
+    message: string;
+  };
+}
+
 export type SSEEvent =
   | SSETextDeltaEvent
   | SSETextEvent
@@ -120,5 +140,6 @@ export type SSEEvent =
   | SSEErrorEvent
   | SSESubAgentEvent
   | SSESubAgentEndEvent
+  | SSEUseCanvasEvent
   | SSEDoneEvent
   | SSESessionIdEvent;

@@ -34,8 +34,10 @@ import {
   ArrowUpIcon,
   CheckIcon,
   CheckCircle2,
+  ChevronDownIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  ChevronUpIcon,
   Circle,
   CopyIcon,
   DownloadIcon,
@@ -46,7 +48,7 @@ import {
   RefreshCwIcon,
   SquareIcon,
 } from "lucide-react";
-import { type FC, useEffect } from "react";
+import { type FC, useEffect, useState } from "react";
 import { setActiveThreadId } from "@/lib/chat/active-thread";
 
 // Tracks the current thread ID and syncs it to the module-level variable so
@@ -100,55 +102,89 @@ export const Thread: FC = () => {
 
 const FloatingTodoList: FC = () => {
   const todoLists = useTodoList();
+  const [collapsed, setCollapsed] = useState(false);
 
   if (todoLists.length === 0) {
     return null;
   }
 
+  // Find the currently in-progress item across all lists
+  const inProgressItem = todoLists
+    .flatMap((l) => l.items)
+    .find((item) => item.status === "in_progress");
+
   return (
-    <div className="absolute top-0 left-0 right-0 z-40 pointer-events-none">
-      <div className="mx-auto flex w-full max-w-[var(--thread-max-width)] flex-col gap-2 px-4 pt-4 pointer-events-auto">
+    <div className="absolute top-2 right-2 z-40 pointer-events-none">
+      <div className="flex flex-col items-end gap-2 pointer-events-auto">
         {todoLists.map((todoList) => (
           <div
             key={todoList.list_id}
-            className="rounded-lg border bg-card/80 backdrop-blur-sm shadow-sm overflow-hidden"
+            className="rounded-lg border bg-card/90 backdrop-blur-sm shadow-md overflow-hidden min-w-[220px] max-w-[300px]"
           >
-            <div className="flex items-center gap-2 border-b bg-muted/50 px-4 py-2.5">
-              <ListTodo className="size-4 text-primary" />
-              <h3 className="font-medium text-sm">Todo List</h3>
+            {/* Header - always visible */}
+            <div
+              className="flex items-center gap-2 bg-muted/50 px-3 py-2 cursor-pointer select-none"
+              onClick={() => setCollapsed((c) => !c)}
+            >
+              <ListTodo className="size-3.5 text-primary shrink-0" />
+              {collapsed && inProgressItem ? (
+                <>
+                  <Loader2 className="size-3.5 shrink-0 text-blue-500 animate-spin" />
+                  <span className="text-xs truncate flex-1 text-foreground">
+                    {inProgressItem.active_form || inProgressItem.content}
+                  </span>
+                </>
+              ) : (
+                <h3 className="font-medium text-xs flex-1">Todo List</h3>
+              )}
+              <button
+                className="ml-1 rounded p-0.5 hover:bg-muted transition-colors"
+                onClick={(e) => { e.stopPropagation(); setCollapsed((c) => !c); }}
+                aria-label={collapsed ? "Expand" : "Collapse"}
+              >
+                {collapsed ? (
+                  <ChevronDownIcon className="size-3 text-muted-foreground" />
+                ) : (
+                  <ChevronUpIcon className="size-3 text-muted-foreground" />
+                )}
+              </button>
             </div>
-            <ul className="divide-y max-h-64 overflow-y-auto">
-              {todoList.items.map((item, index) => (
-                <li
-                  key={`${todoList.list_id}-${item.content}-${index}`}
-                  className="flex items-center gap-3 px-4 py-2"
-                >
-                  {item.status === "completed" ? (
-                    <CheckCircle2 className="size-4 shrink-0 text-primary" />
-                  ) : item.status === "in_progress" ? (
-                    <Loader2 className="size-4 shrink-0 text-blue-500 animate-spin" />
-                  ) : (
-                    <Circle className="size-4 shrink-0 text-muted-foreground" />
-                  )}
-                  <div className="flex flex-col flex-1 min-w-0">
-                    <span
-                      className={cn(
-                        "text-sm truncate",
-                        item.status === "completed" &&
-                          "text-muted-foreground line-through"
-                      )}
-                    >
-                      {item.content}
-                    </span>
-                    {item.status === "in_progress" && item.active_form && (
-                      <span className="text-xs text-muted-foreground mt-0.5 truncate">
-                        {item.active_form}
-                      </span>
+
+            {/* Item list - hidden when collapsed */}
+            {!collapsed && (
+              <ul className="divide-y max-h-64 overflow-y-auto border-t">
+                {todoList.items.map((item, index) => (
+                  <li
+                    key={`${todoList.list_id}-${item.content}-${index}`}
+                    className="flex items-center gap-2.5 px-3 py-2"
+                  >
+                    {item.status === "completed" ? (
+                      <CheckCircle2 className="size-3.5 shrink-0 text-primary" />
+                    ) : item.status === "in_progress" ? (
+                      <Loader2 className="size-3.5 shrink-0 text-blue-500 animate-spin" />
+                    ) : (
+                      <Circle className="size-3.5 shrink-0 text-muted-foreground" />
                     )}
-                  </div>
-                </li>
-              ))}
-            </ul>
+                    <div className="flex flex-col flex-1 min-w-0">
+                      <span
+                        className={cn(
+                          "text-xs truncate",
+                          item.status === "completed" &&
+                            "text-muted-foreground line-through"
+                        )}
+                      >
+                        {item.content}
+                      </span>
+                      {item.status === "in_progress" && item.active_form && (
+                        <span className="text-xs text-muted-foreground mt-0.5 truncate">
+                          {item.active_form}
+                        </span>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         ))}
       </div>
@@ -213,7 +249,7 @@ const ThreadSuggestions: FC = () => {
           <ThreadPrimitive.Suggestion prompt={suggestion.prompt} send asChild>
             <Button
               variant="ghost"
-              className="aui-thread-welcome-suggestion h-auto w-full @md:flex-col flex-wrap items-start justify-start gap-1 rounded-2xl border px-4 py-3 text-left text-sm transition-colors hover:bg-muted"
+              className="aui-thread-welcome-suggestion h-auto w-full @md:flex-col flex-wrap items-start justify-start gap-1 rounded-2xl border px-4 py-3 text-left text-sm transition-colors hover:bg-muted cursor-pointer"
               aria-label={suggestion.prompt}
             >
               <span className="aui-thread-welcome-suggestion-text-1 font-medium">

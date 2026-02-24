@@ -232,6 +232,22 @@ export class CustomChatTransport extends HttpChatTransport<UIMessage> {
               break;
             }
 
+            case "use_canvas": {
+              // Emit a custom event for canvas updates
+              if (typeof window !== "undefined") {
+                const canvasData = {
+                  action: event.data.action,
+                  file: event.data.file,
+                  message: event.data.message,
+                };
+                console.log("[CustomChatTransport] Dispatching use_canvas event:", canvasData);
+                window.dispatchEvent(
+                  new CustomEvent("use_canvas", { detail: canvasData })
+                );
+              }
+              break;
+            }
+
             case "session_id": {
               // Persist the backend session ID for this thread so subsequent
               // requests can include X-Session-ID and share session memory.

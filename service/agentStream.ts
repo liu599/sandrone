@@ -1,5 +1,5 @@
 const AGENT_WS_URL =
-  process.env.AGENT_WS_URL || "ws://localhost:10338/agentOS/v1/ws_stream";
+  process.env.AGENT_WS_URL || "ws://localhost:10340/agentOS/v1/ws_stream";
 
 export interface AgentStreamCallbacks {
   /** Fires once when the server sends the session_id event */
@@ -37,6 +37,32 @@ export interface AgentStreamCallbacks {
     item_id: string;
     completed?: boolean;
     status?: string;
+  }) => void;
+  /** Fires when a use_canvas event is received */
+  onUseCanvas?: (data: {
+    action: "create" | "modify";
+    file: {
+      uuid: string;
+      filename: string;
+      downloadUrl: string;
+      fileType: string;
+      description?: string;
+      module: string;
+      createdAt: string;
+    };
+    message: string;
+  }) => void;
+  /** Fires when a tool_use event is received (generic tool call) */
+  onToolUse?: (data: {
+    toolUseId: string;
+    toolName: string;
+    args: unknown;
+    message: string;
+  }) => void;
+  /** Fires when a tool_use_end event is received */
+  onToolUseEnd?: (data: {
+    toolUseId: string;
+    message: string;
   }) => void;
 }
 
@@ -156,6 +182,35 @@ export function streamAgentMessage(
       if (parsed.type === "todo_update") {
         console.log("[AgentStream] Todo update received:", parsed.data?.item_id);
         callbacks.onTodoUpdate?.(parsed.data);
+        return;
+      }
+
+      // Handle use_canvas event
+      if (parsed.type === "use_canvas") {
+        console.log("[AgentStream] Canvas event received:", parsed.data?.action, parsed.data?.file?.filename);
+        callbacks.onUseCanvas?.(parsed.data);
+        return;
+      }
+
+      // Handle tool_use event
+      if (parsed.type === "tool_use") {
+        console.log("[AgentStream] Tool use:", parsed.data?.toolName);
+        callbacks.onToolUse?.({
+          toolUseId: parsed.tool_use_id || parsed.data?.toolUseId,
+          toolName: parsed.data?.toolName,
+          args: parsed.data?.args,
+          message: parsed.data?.message,
+        });
+        return;
+      }
+
+      // Handle tool_use_end event
+      if (parsed.type === "tool_use_end") {
+        console.log("[AgentStream] Tool use end:", parsed.tool_use_id);
+        callbacks.onToolUseEnd?.({
+          toolUseId: parsed.tool_use_id,
+          message: parsed.data?.message,
+        });
         return;
       }
 

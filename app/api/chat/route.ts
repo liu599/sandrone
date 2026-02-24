@@ -131,6 +131,19 @@ export async function POST(req: Request) {
           });
         },
 
+        onUseCanvas: (data) => {
+          emit({
+            ...baseFields,
+            id: crypto.randomUUID(),
+            type: "use_canvas",
+            data: {
+              action: data.action,
+              file: data.file,
+              message: data.message,
+            },
+          });
+        },
+
         onError: (error) => {
           console.error("[Route] Agent error:", error);
           emit({
