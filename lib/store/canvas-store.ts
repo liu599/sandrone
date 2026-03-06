@@ -10,6 +10,7 @@ export interface CanvasFile {
   module: string;
   createdAt: string;
   modificationsCount?: number;
+  content?: string; // Cached content for editing
 }
 
 interface CanvasStore {
@@ -18,6 +19,8 @@ interface CanvasStore {
   file: CanvasFile | null;
   error: string | null;
   isLoading: boolean;
+  isEditable: boolean; // Whether canvas is in edit mode
+  hasUnsavedChanges: boolean; // Whether there are unsaved changes
 
   // Actions
   openCanvas: (file: CanvasFile) => void;
@@ -26,15 +29,21 @@ interface CanvasStore {
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   clearError: () => void;
+  setEditable: (editable: boolean) => void;
+  setContent: (content: string) => void;
+  setUnsavedChanges: (hasChanges: boolean) => void;
+  saveCanvas: () => Promise<void>;
 }
 
 export const useCanvasStore = create<CanvasStore>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       isActive: false,
       file: null,
       error: null,
       isLoading: false,
+      isEditable: false,
+      hasUnsavedChanges: false,
 
       openCanvas: (file) => {
         set({
@@ -42,6 +51,8 @@ export const useCanvasStore = create<CanvasStore>()(
           file,
           error: null,
           isLoading: false,
+          isEditable: true, // Default to editable for interactive canvas
+          hasUnsavedChanges: false,
         });
       },
 
@@ -62,6 +73,8 @@ export const useCanvasStore = create<CanvasStore>()(
           file: null,
           error: null,
           isLoading: false,
+          isEditable: false,
+          hasUnsavedChanges: false,
         });
       },
 
@@ -75,6 +88,31 @@ export const useCanvasStore = create<CanvasStore>()(
 
       clearError: () => {
         set({ error: null });
+      },
+
+      setEditable: (editable) => {
+        set({ isEditable: editable });
+      },
+
+      setContent: (content) => {
+        set((state) => ({
+          file: state.file ? { ...state.file, content } : null,
+          hasUnsavedChanges: true,
+        }));
+      },
+
+      setUnsavedChanges: (hasChanges) => {
+        set({ hasUnsavedChanges: hasChanges });
+      },
+
+      saveCanvas: async () => {
+        const { file, hasUnsavedChanges } = get();
+        if (!file || !hasUnsavedChanges) return;
+
+        // Here you would implement the actual save logic
+        // For example, calling an API to save the content
+        console.log('Saving canvas content:', file.content);
+        set({ hasUnsavedChanges: false });
       },
     }),
     {

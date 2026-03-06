@@ -29,7 +29,7 @@ export function UserFooter() {
         <SidebarFooter className="aui-sidebar-footer border-t">
           <SidebarMenu>
             <SidebarMenuItem>
-              <SidebarMenuButton size="lg" onClick={() => setDialogOpen(true)}>
+              <SidebarMenuButton className="hover:cursor-pointer" size="lg" onClick={() => setDialogOpen(true)}>
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                   <User className="size-4" />
                 </div>
@@ -49,7 +49,7 @@ export function UserFooter() {
     <SidebarFooter className="aui-sidebar-footer border-t">
       <SidebarMenu>
         <SidebarMenuItem>
-          <div className="group flex w-full items-center gap-2 rounded-md px-2 py-2">
+          <div className="group flex w-full items-center gap-2 rounded-md px-2 py-2 group-hover:cursor-pointer">
             <div className="flex aspect-square size-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-sm font-semibold text-sidebar-primary-foreground">
               {initial}
             </div>
@@ -59,7 +59,7 @@ export function UserFooter() {
             <button
               type="button"
               onClick={handleLogout}
-              className="text-muted-foreground hover:text-foreground opacity-0 transition-opacity group-hover:opacity-100"
+              className="text-muted-foreground hover:text-foreground opacity-0 transition-opacity group-hover:opacity-100 cursor-pointer"
               title="Logout"
             >
               <LogOut className="size-4" />
